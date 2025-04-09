@@ -47,4 +47,4 @@ const configurateDatabase = async () => {
   createAdmin(client);
 };
 
-export default configurateDatabase;
+export { configurateDatabase, client };

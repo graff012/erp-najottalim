@@ -2,6 +2,6 @@ import { Router } from 'express';
 
 const studentRouter = Router();
 
-studentRouter.post();
+// studentRouter.post();
 
 export default studentRouter;
