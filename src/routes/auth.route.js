@@ -9,7 +9,10 @@ authRouterStaff.post(
   '/auth/staff/login',
   controller.loginStaffController.bind(controller)
 );
-// authRouterStaff.post('/auth/staff/register');
+authRouterStaff.post(
+  '/auth/staff/register',
+  controller.registerStaffController.bind(controller)
+);
 
 const authRouterStudent = Router();
 

@@ -4,13 +4,42 @@ class AuthController {
   constructor() {
     this.authService = new AuthService();
   }
+
+  async registerStaffController(req, res, next) {
+    const data = req.body;
+
+    try {
+      const staff = await this.authService.registerStaff(data);
+
+      console.log('data at controller: ', data);
+
+      res.status(201).json({ staff });
+    } catch (err) {
+      console.error('error at controller: ', err);
+      next(err);
+    }
+  }
+
+  async registerStudentController(req, res, next) {
+    const data = req.body;
+
+    try {
+      const student = await this.authService.registerStudent(data);
+
+      res.status(201).json(student);
+    } catch (err) {
+      console.error(err.message);
+      next(err);
+    }
+  }
+
   async loginStaffController(req, res, next) {
     const data = req.body;
     try {
       const { accessToken, refreshToken } =
         await this.authService.loginStaff(data);
 
-      req.status(201).json({ accessToken, refreshToken });
+      res.status(201).json({ accessToken, refreshToken });
     } catch (err) {
       next(err);
     }

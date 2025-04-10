@@ -12,13 +12,26 @@ class JwtService {
     );
 
     const refreshToken = jwt.sign(
-      { userId: user_id, userRole: role },
+      { userId: user_id, userRole: role.name },
       this.#secretKey,
       { expiresIn: '2h' }
     );
 
     return { accessToken, refreshToken };
   }
+
+  generateStudentToken(user_id) {
+    const accessToken = jwt.sign({ userId: user_id }, this.#secretKey, {
+      expiresIn: '1h',
+    });
+
+    const refreshToken = jwt.sign({ userId: user_id }, this.#secretKey, {
+      expiresIn: '3h',
+    });
+
+    return { accessToken, refreshToken };
+  }
+
   verifyToken(token) {
     try {
       jwt.verify(token, this.#secretKey);

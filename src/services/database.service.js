@@ -2,7 +2,17 @@ import { client } from '../config/database.js';
 import CustomError from '../utils/custom.error.js';
 
 class DatabaseService {
-  async createStaff(data) {}
+  async createStaff({ first_name, last_name, username, password }) {
+    const { rows } = await client.query(
+      `insert into staffs (first_name, last_name, username, password)
+       values ($1, $2, $3, $4) returning *`,
+      [first_name, last_name, username, password]
+    );
+
+    console.log('createStaff: ', rows[0]);
+
+    return rows[0];
+  }
 
   async createStudent(data) {}
 
@@ -33,11 +43,14 @@ class DatabaseService {
   }
 
   async findStaffRole(staff_id) {
-    const { rows } = await this.client.query(
+    console.log('staff id: ', staff_id); // staff id is coming
+    const { rows } = await client.query(
       `select roles.name from staffs inner join staff_roles sr on sr.staff_id = staffs.id
       inner join roles on roles.id = sr.role_id where sr.staff_id = $1`,
       [staff_id]
     );
+
+    console.log('role name: ', rows[0]);
 
     return rows[0];
   }
