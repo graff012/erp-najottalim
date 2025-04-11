@@ -16,17 +16,30 @@ const client = new Client({
 });
 
 const initTables = async () => {
-  const schemaPath = path.join(
-    process.cwd(),
-    'src',
-    'migrations',
-    'database.schema.sql'
-  );
+  try {
+    const { rows } = await client.query(`select exists(
+      select from information_schema.tables 
+      where table_name = 'courses'
+      )`);
 
-  const schema = fs.readFileSync(schemaPath, 'utf-8');
+    const tableExists = rows[0].exists;
 
-  if (!schema) {
-    await client.query(schema);
+    if (!tableExists) {
+      const schemaPath = path.join(
+        process.cwd(),
+        'src',
+        'migrations',
+        'database.schema.sql'
+      );
+
+      const schema = fs.readFileSync(schemaPath, 'utf-8');
+
+      if (schema) {
+        await client.query(schema);
+      }
+    }
+  } catch (err) {
+    console.error(err);
   }
 
   return;

@@ -1,4 +1,4 @@
-import AuthService from '../services/auth.service.js';
+import AuthService from "../services/auth.service.js";
 
 class AuthController {
   constructor() {
@@ -11,11 +11,8 @@ class AuthController {
     try {
       const staff = await this.authService.registerStaff(data);
 
-      console.log('data at controller: ', data);
-
       res.status(201).json({ staff });
     } catch (err) {
-      console.error('error at controller: ', err);
       next(err);
     }
   }
@@ -36,8 +33,9 @@ class AuthController {
   async loginStaffController(req, res, next) {
     const data = req.body;
     try {
-      const { accessToken, refreshToken } =
-        await this.authService.loginStaff(data);
+      const { accessToken, refreshToken } = await this.authService.loginStaff(
+        data
+      );
 
       res.status(201).json({ accessToken, refreshToken });
     } catch (err) {
@@ -48,10 +46,11 @@ class AuthController {
     const data = req.body;
 
     try {
-      const { accessToken, refreshToken } =
-        await this.authService.loginStudent(data);
+      const { accessToken, refreshToken } = await this.authService.loginStudent(
+        data
+      );
 
-      req.status(201).json({ accessToken, refreshToken });
+      res.status(201).json({ accessToken, refreshToken });
     } catch (err) {
       next(err);
     }

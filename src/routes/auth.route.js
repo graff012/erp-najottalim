@@ -20,6 +20,10 @@ authRouterStudent.post(
   '/auth/student/login',
   controller.loginStudentController.bind(controller)
 );
-// authRouterStaff.post('/auth/student/register');
+
+authRouterStudent.post(
+  '/auth/student/register',
+  controller.registerStudentController.bind(controller)
+);
 
 export { authRouterStaff, authRouterStudent };

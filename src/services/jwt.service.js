@@ -12,10 +12,12 @@ class JwtService {
     );
 
     const refreshToken = jwt.sign(
-      { userId: user_id, userRole: role.name },
+      { userId: user_id, userRole: role },
       this.#secretKey,
       { expiresIn: '2h' }
     );
+
+    console.log('refresh token: ', role);
 
     return { accessToken, refreshToken };
   }

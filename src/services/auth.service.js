@@ -1,8 +1,8 @@
-import CustomError from '../utils/custom.error.js';
-import DatabaseService from './database.service.js';
-import JwtService from './jwt.service.js';
-import ValidationService from './validate.service.js';
-import bcrypt from 'bcryptjs';
+import CustomError from "../utils/custom.error.js";
+import DatabaseService from "./database.service.js";
+import JwtService from "./jwt.service.js";
+import ValidationService from "./validate.service.js";
+import bcrypt from "bcryptjs";
 
 class AuthService {
   constructor() {
@@ -15,12 +15,12 @@ class AuthService {
     const { first_name, last_name, username, password } = data;
 
     if (!first_name || !last_name || !username || !password) {
-      throw new CustomError('All fields are required', 401);
+      throw new CustomError("All fields are required", 401);
     }
 
     const existedUser = await this.dbService.findOneStaff(username);
     if (existedUser) {
-      throw new CustomError('Username already exists', 409);
+      throw new CustomError("Username already exists", 409);
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -31,7 +31,6 @@ class AuthService {
     };
 
     const createStaff = await this.dbService.createStaff(newStaff);
-    console.log('createStaff: ', createStaff);
 
     const role = await this.dbService.findStaffRole(createStaff.id);
 
@@ -43,7 +42,38 @@ class AuthService {
     return { createStaff, accessToken, refreshToken };
   }
 
-  async registerStudent() {}
+  async registerStudent(data) {
+    const { first_name, last_name, username, password, group_id } = data;
+
+    if (!first_name || !last_name || !username || !password) {
+      throw new CustomError("All fields are required", 404);
+    }
+
+    const existedUser = await this.dbService.findOneStudent(username);
+    if (existedUser) throw new CustomError("Username already exists", 409);
+
+    // hashing the password
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    const studentPayload = {
+      ...data,
+      password: hashedPassword,
+      group_id: group_id || null,
+    };
+
+    const createStudent = await this.dbService.createStudent(studentPayload);
+
+    const { accessToken, refreshToken } = this.jwtService.generateStudentToken(
+      createStudent.id
+    );
+
+    return {
+      createStudent,
+      accessToken,
+      refreshToken,
+    };
+  }
 
   async loginStaff({ username, password }) {
     await this.validateService.staffValidationLogin({ username, password });
@@ -51,13 +81,13 @@ class AuthService {
     const findStaff = await this.dbService.findOneStaff(username);
 
     if (!findStaff) {
-      throw new CustomError('Username or password is incorrect');
+      throw new CustomError("Username or password is incorrect");
     }
 
     const comparedPassword = await bcrypt.compare(password, findStaff.password);
 
     if (!comparedPassword) {
-      throw new CustomError('Username or password is incorrect');
+      throw new CustomError("Username or password is incorrect");
     }
 
     const role = await this.dbService.findStaffRole(findStaff.id);
@@ -73,13 +103,18 @@ class AuthService {
 
     const findStudent = await this.dbService.findOneStudent(username);
     if (!findStudent) {
-      throw new CustomError('Username or password is incorrect', 404);
+      throw new CustomError("Username or password is incorrect", 404);
     }
 
-    const comparedPassword = await bcrypt.compare(password, findStudent.id);
+    const comparedPassword = await bcrypt.compare(
+      password,
+      findStudent.password
+    );
+
+    console.log("compered password: ", comparedPassword);
 
     if (!comparedPassword) {
-      throw new CustomError('Username or password is incorrect', 404);
+      throw new CustomError("Username or password is incorrect", 404);
     }
 
     const { accessToken, refreshToken } = this.jwtService.generateStudentToken(
